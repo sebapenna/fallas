@@ -1,8 +1,9 @@
-import React, {useReducer} from 'react';
-import {Text, View, StyleSheet, TextInput, Button, TouchableOpacity} from 'react-native';
+import React, {useReducer, useState} from 'react';
+import {Text, View, StyleSheet, TextInput, Button, TouchableOpacity, Modal} from 'react-native';
 import {StatusBar} from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {CustomPicker, Item} from '../components/DropDownList';
+import axios from "axios";
 
 interface Form {
   precio: string,
@@ -25,6 +26,20 @@ const MainScreen = () => {
   const {top} = useSafeAreaInsets()
 
   const [form, setForm] = useReducer((state: Form, newState: Partial<Form> ) => ({...state, ...newState}), defaultForm, () => defaultForm)
+
+  const [recommendation, setRecommendation] = useState('')
+
+  const hideModal = () => {
+    setRecommendation('')
+  }
+
+  const sendForm = async () => {
+    const res = await axios.get('http://192.168.0.4:5000/buscar_colchon', {
+      params: form
+    })
+    console.log(res.data)
+    setRecommendation(res.data)
+  }
 
   return (
     <View style={[styles.container]}>
@@ -68,10 +83,17 @@ const MainScreen = () => {
         </CustomPicker>
       </View>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity activeOpacity={0.7} style={styles.button}>
+        <TouchableOpacity onPress={sendForm} activeOpacity={0.7} style={styles.button}>
           <Text style={styles.buttonText}>Obtener recomendación</Text>
         </TouchableOpacity>
       </View>
+      <Modal transparent visible={!!recommendation}>
+        <TouchableOpacity onPress={hideModal} style={styles.modalTouch}>
+          <View style={styles.recommendationContainer}>
+            <Text style={styles.recommendationText}>{recommendation}</Text>
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </View>
   );
 };
@@ -135,4 +157,27 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: 'center',
   },
+  modalTouch: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#00000022',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  recommendationContainer: {
+    backgroundColor: 'white',
+    width: '70%',
+    padding: 32,
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: {
+        width: 0,
+        height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+
+    elevation: 5,
+  },
+  recommendationText: {},
 });
