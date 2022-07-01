@@ -16,14 +16,24 @@ type TouchPosition = {
   y?: number;
 }
 
-interface PickerProps<T> {
-  children: React.ReactNode;
+interface ToString {
+  toString: Function,
+}
+
+interface PickerProps<T extends ToString> {
+  children: React.ReactElement<ChildProps<T>> | React.ReactElement<ChildProps<T>>[];
   selectedValue: T;
   onValueChange: (value: T, index: number) => void;
   style: StyleProp<ViewStyle>
 }
 
 const { height } = Dimensions.get('window')
+
+interface ChildProps<T> {
+  value: T;
+  label: string;
+}
+
 
 export function CustomPicker<T> ({children, selectedValue, onValueChange, style}: PickerProps<T>) {
 
@@ -44,25 +54,31 @@ export function CustomPicker<T> ({children, selectedValue, onValueChange, style}
 
 
   const items = useMemo(() =>
-      React.Children.toArray(children).map((child, index) =>
-        <TouchableOpacity
-          key={child.props.value}
-          style={{padding: 16, borderBottomWidth: 1, borderColor: 'lightgrey'}}
-          onPress={() => {
-            onValueChange && onValueChange(child.props.value, index);
-            closeModal()
-          }}>
-          <Text>{child.props.label}</Text>
-        </TouchableOpacity>
-      ),
+      React.Children.toArray(children).map((child, index) => {
+        if (React.isValidElement<ChildProps<T>>(child)) return (
+            <TouchableOpacity
+                key={child.props.label}
+                style={{padding: 16, borderBottomWidth: 1, borderColor: 'lightgrey'}}
+                onPress={() => {
+                  onValueChange && onValueChange(child.props.value, index);
+                  closeModal()
+                }}>
+              <Text>{child.props.label}</Text>
+            </TouchableOpacity>
+        )
+      }),
     [children]);
 
   const showValue = useMemo(() => {
     console.log('Selected value is:', selectedValue)
+    const firstChild = React.Children.toArray(children)[0];
+    const selectedChild = React.Children.toArray(children).find(child => {
+      if (React.isValidElement<ChildProps<T>>(child)) return child.props.value === selectedValue
+    })
     if (selectedValue) {
-      return React.Children.toArray(children).find(child => child.props.value === selectedValue)?.props.label
+      return React.isValidElement<ChildProps<T>>(selectedChild) ? selectedChild.props.label : undefined
     } else {
-      return React.Children.toArray(children)[0]?.props.label
+      return React.isValidElement<ChildProps<T>>(firstChild) ? firstChild.props.label : undefined
     }
   }, [selectedValue, children])
 
