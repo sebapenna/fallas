@@ -88,7 +88,7 @@ const MainScreen = () => {
         </TouchableOpacity>
       </View>
       <Modal transparent visible={!!recommendation}>
-        <TouchableOpacity onPress={hideModal} style={styles.modalTouch}>
+        <TouchableOpacity activeOpacity={1} onPress={hideModal} style={styles.modalTouch}>
           <View style={styles.recommendationContainer}>
             <Text style={styles.recommendationText}>{recommendation}</Text>
           </View>
