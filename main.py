@@ -36,7 +36,7 @@ def handle():
     response = f"No podemos recomendarte un colchon"
 
     if engine.colchon_recomendado:
-        response = f"Tu colchon idea es '{engine.colchon_recomendado.value}'"
+        response = f"Tu colchon ideal es '{engine.colchon_recomendado.value}'"
 
     r = make_response(response)
     r.headers.add("Access-Control-Allow-Origin", "*")
