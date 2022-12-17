@@ -37,10 +37,10 @@ class MotorInferencia:
         resultado = max(resultado_dict, key=resultado_dict.get)
 
         respuesta = "El colchon que más se ajusta a sus necesidades es " \
-               + resultado \
-               + " (%" \
-               + str(resultado_dict[resultado]) \
-               + ")"
+                    + resultado \
+                    + " (%" \
+                    + str(resultado_dict[resultado]) \
+                    + ")"
 
         print(respuesta)
         return respuesta
