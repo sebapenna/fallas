@@ -29,10 +29,12 @@ class MotorInferencia:
 
         # El resultado a mostrar al usuario sera en base a la certeza
         # Se retorna la de mayor valor, que podria no ser necesariamente 1
-        resultado_dict = dict()
+        resultado_dict = {}
 
-        for resultado in six.iterkeys(certeza_reglas):
-            resultado_dict[resultado] = round(max(certeza_reglas[resultado]))
+        for item in certeza_reglas.items():
+            resultado = item[0]
+            certeza = item[1]
+            resultado_dict[resultado] = round(max(certeza))
 
         resultado = max(resultado_dict, key=resultado_dict.get)
 
